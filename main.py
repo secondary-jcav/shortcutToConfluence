@@ -1,10 +1,8 @@
 from dotenv import load_dotenv, find_dotenv
 import os
 
-
-import Confluence as cf
+from Confluence import Confluence as cf
 from Shortcut import Shortcut as sc
-
 
 # def get_completion(inputs, parameters=None,ENDPOINT_URL=os.environ['HF_API_SUMMARY_BASE']):
 #     headers = {
@@ -27,11 +25,10 @@ if __name__ == '__main__':
     sc_api_key = os.environ['SHORTCUT_TOKEN']
     cf_api_key = os.environ['CONFLUENCE_TOKEN']
     story = sc(sc_api_key)
-    issue = story.get_story(16)
-    print(story.is_doc_needed())
-
-    # cf.create_confluence_page(cf_api_key, 'DRAFT')
-    # cf.create_confluence_page(cf_api_key, 'TRIAL')
-    # cf.get_confluence_page(cf_account, cf_api_key)
+    story.get_story(16)
+    print(f'Does it need docs: {story.is_doc_needed()}')
+    if story.is_doc_needed():
+        docs = cf(cf_api_key)
+        docs.create_confluence_page(story.title, story.body)
 
 
