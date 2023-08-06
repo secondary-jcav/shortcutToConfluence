@@ -9,43 +9,23 @@ class Confluence:
         self.api_endpoint = '/rest/api/content'
 
     def create_confluence_page(self, title, body='<p>This is a new page</p>'):
-
+        """
+        Creates a basic page in Confluence using the title & body provided
+        """
         headers = {
             'Authorization': f'Basic {self.key}',
             'Content-Type': 'application/json'
         }
 
-        data = {'type': 'page', 'title': title,
+        data = {'type': 'page', 'title': '[DRAFT]' + title,
                 'space': {'key': 'SC'},
                 'body': {'storage': {'value': body, 'representation':
-                'storage'}}}
+                    'storage'}}}
         try:
             response = requests.post(f'{self.base_url}{self.api_endpoint}', json=data, headers=headers)
 
             if response.status_code == 200:
                 print(f'Confluence page "{title}" created successfully.')
-            else:
-                print(f'Failed to create Confluence page. Status code: {response.status_code}')
-                print(response.json())
-
-        except requests.exceptions.RequestException as e:
-            print(f'An error occurred: {e}')
-
-
-    def get_confluence_page(self, id):
-        base_url = 'https://juliopedia.atlassian.net/wiki/confluence'  # Replace with your Confluence URL
-        api_endpoint = '/rest/api/spaces/sc/pages'
-
-        headers = {
-
-            'Authorization': f'Basic {self.key}',
-            'Content-Type': 'application/json'
-        }
-        try:
-            response = requests.get(f'{base_url}{api_endpoint}{id}', headers=headers)
-
-            if response.status_code == 200:
-                print(f'Confluence page  read successfully.')
             else:
                 print(f'Failed to create Confluence page. Status code: {response.status_code}')
                 print(response.json())

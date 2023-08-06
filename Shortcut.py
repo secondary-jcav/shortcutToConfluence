@@ -6,7 +6,7 @@ class Shortcut:
         self.key = key
         self.api_url_base = 'https://api.app.shortcut.com/api/beta'
         self.search_endpoint = '/search/stories'
-        self.doc_tag = 'doc'
+        self.doc_tag = 'doc_needed'
         self.title = ''
         self.body = ''
         self.comments = []
@@ -32,11 +32,16 @@ class Shortcut:
 
     def is_doc_needed(self):
         """
-        :return: True if story has a 'doc needed' label. False otherwise.
+        :return: True if story has a 'doc_needed' label. False otherwise.
         """
         has_doc_label = any(label['name'] == self.doc_tag for label in self.labels)
         return has_doc_label
 
+    def get_content_labels(self):
+        """
+        :return: removes doc label and returns everything else
+        """
+        return [string for string in self.labels if string != self.doc_tag]
 
 
 
