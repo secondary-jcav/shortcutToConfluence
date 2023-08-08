@@ -20,7 +20,7 @@ def write_draft(subject_matter, title, details):
     docs = Confluence(cf_api_key)
     docs.create_confluence_page(story.title, draft)
     # Tag owner in confluence
-    docs.add_sc_link(story.title, story.owner)
+    docs.add_link(story.title, story.link)
 
 
 if __name__ == '__main__':

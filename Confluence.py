@@ -9,6 +9,7 @@ class Confluence:
         self.headers = self.build_headers(key)
         self.base_url = 'https://juliopedia.atlassian.net/wiki'
         self.api_endpoint = '/rest/api/content'
+        self.post_id = ''
 
     def create_confluence_page(self, title, body='<p>This is a new page</p>'):
         """
@@ -22,6 +23,7 @@ class Confluence:
             response = requests.post(f'{self.base_url}{self.api_endpoint}', json=data, headers=self.headers)
 
             if response.status_code == 200:
+                self.post_id = response.json()['id']
                 print(f'Confluence page "{title}" created successfully.')
             else:
                 print(f'Failed to create Confluence page. Status code: {response.status_code}')
@@ -30,11 +32,14 @@ class Confluence:
         except requests.exceptions.RequestException as e:
             print(f'An error occurred: {e}')
 
-    def add_sc_link(self, page_title, url):
+    def add_link(self, page_title, url):
+        """
+        Adds a footer comment with a link
+        """
         data = {'title': f'{page_title}'}
         try:
             response = requests.get(f'{self.base_url}{self.api_endpoint}', json=data, headers=self.headers)
-            parent_page = response.json()['results'][-1]
+            parent_page = self.get_parent_page(self.post_id,response.json()['results'])
             comment_data = {'type': 'comment', 'container': parent_page,
                             'body': {'storage': {'value':f"<a href=\"{url}\">Link to story</a>", 'representation': 'storage'}}}
             response = requests.post(f'{self.base_url}{self.api_endpoint}',
@@ -52,3 +57,16 @@ class Confluence:
             'Content-Type': 'application/json'
         }
         return headers
+
+    @staticmethod
+    def get_parent_page(post_id, pages):
+        """
+        :return: Container with the page that matches post_id
+        """
+        found_page = None
+        for page in pages:
+            if page.get('id') == post_id:
+                found_page = page
+                break
+        return found_page
+

@@ -7,11 +7,12 @@ class Shortcut:
         self.key = key
         self.api_url_base = 'https://api.app.shortcut.com/api/v3'
         self.search_endpoint = '/search/stories'
+        self.id = ''
+        self.link = ''
         self.owner = ''
         self.doc_tag = 'doc_needed'
         self.title = ''
         self.body = ''
-        self.comments = []
         self.labels = []
 
     def get_story(self, story_id):
@@ -27,13 +28,23 @@ class Shortcut:
             print(e)
         story = response.json()['data'][0]
         self.title = story['name']
+        self.id = story['id']
+        self.link = story['app_url']
         self.body = story['description']
-        self.comments = story['comments']
         self.labels = story['labels']
         self.owner = self.get_member(story['owner_ids'][0])
         print(self.title)
 
+    def add_link_to_comment(self):
+
+        pass
+
     def get_member(self, member_id):
+        """
+        Translates shortcut's member id to a name, with the idea to tag them,
+        email them...
+        :return: member name as string
+        """
         headers = {
             "Content-Type": "application/json",
             "Shortcut-Token": self.key
