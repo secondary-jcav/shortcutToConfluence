@@ -10,6 +10,7 @@ class Confluence:
         self.base_url = 'https://juliopedia.atlassian.net/wiki'
         self.api_endpoint = '/rest/api/content'
         self.post_id = ''
+        self.post_link = ''
 
     def create_confluence_page(self, title, body='<p>This is a new page</p>'):
         """
@@ -42,13 +43,13 @@ class Confluence:
             parent_page = self.get_parent_page(self.post_id,response.json()['results'])
             comment_data = {'type': 'comment', 'container': parent_page,
                             'body': {'storage': {'value':f"<a href=\"{url}\">Link to story</a>", 'representation': 'storage'}}}
-            response = requests.post(f'{self.base_url}{self.api_endpoint}',
+            requests.post(f'{self.base_url}{self.api_endpoint}',
                                      data=json.dumps(comment_data),
                                      headers=self.headers)
 
         except requests.exceptions.RequestException as e:
             print(f'An error occurred: {e}')
-        print(response)
+        print('SC link added to confluence page')
 
     @staticmethod
     def build_headers(token):
@@ -58,8 +59,7 @@ class Confluence:
         }
         return headers
 
-    @staticmethod
-    def get_parent_page(post_id, pages):
+    def get_parent_page(self, post_id, pages):
         """
         :return: Container with the page that matches post_id
         """
@@ -68,5 +68,6 @@ class Confluence:
             if page.get('id') == post_id:
                 found_page = page
                 break
+        self.post_link = self.base_url + found_page['_links']['webui']
         return found_page
 

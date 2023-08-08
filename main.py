@@ -19,8 +19,10 @@ def write_draft(subject_matter, title, details):
     # Post to confluence
     docs = Confluence(cf_api_key)
     docs.create_confluence_page(story.title, draft)
-    # Tag owner in confluence
+    # Shortcut link in confluence
     docs.add_link(story.title, story.link)
+    # Confluence link in shortcut
+    story.add_link_to_comment(story.id, docs.post_link)
 
 
 if __name__ == '__main__':

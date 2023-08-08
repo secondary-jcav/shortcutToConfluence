@@ -35,9 +35,19 @@ class Shortcut:
         self.owner = self.get_member(story['owner_ids'][0])
         print(self.title)
 
-    def add_link_to_comment(self):
-
-        pass
+    def add_link_to_comment(self, story_id, link, message="LLM generated docs"):
+        """
+        :param message: text in the comment
+        :param link: url
+        :param story_id: shortcut story id
+        """
+        data = {"text": f'<a href=\"{link}\">{message}</a>'}
+        try:
+            url = self.api_url_base + f'/stories/{story_id}/comments'
+            response = requests.post(url, json=data, headers=self.headers)
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            print(e)
 
     def get_member(self, member_id):
         """
