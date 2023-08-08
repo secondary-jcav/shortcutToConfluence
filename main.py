@@ -1,28 +1,28 @@
 from dotenv import load_dotenv, find_dotenv
 import os
 
-from Confluence import Confluence as cf
-from Shortcut import Shortcut as sc
-from ContentGenerator import ContentGenerator as cg
+from Confluence import Confluence
+from Shortcut import Shortcut
+from ContentGenerator import ContentGenerator
 
 
 def write_draft(subject_matter, title, details):
     """
-    Uses DocWriter class to ask the GPT endpoint.
+    Uses ContentGenerator class to ask the GPT endpoint.
     Uses Confluence class to post to confluence.
     """
     cf_api_key = os.environ['CONFLUENCE_TOKEN']
     gpt_api_key = os.environ['GPT_TOKEN']
-    bot = cg(gpt_api_key)
+    bot = ContentGenerator(gpt_api_key)
     draft = bot.get_completions_response(subject_matter, title, details)
-    docs = cf(cf_api_key)
+    docs = Confluence(cf_api_key)
     docs.create_confluence_page(story.title, draft)
 
 
 if __name__ == '__main__':
     _ = load_dotenv(find_dotenv())  # read local .env file
     sc_api_key = os.environ['SHORTCUT_TOKEN']
-    story = sc(sc_api_key)
+    story = Shortcut(sc_api_key)
     story.get_story(22)
     print(f'Does it need docs: {story.is_doc_needed()}')
     if story.is_doc_needed():
