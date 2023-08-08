@@ -14,15 +14,20 @@ def write_draft(subject_matter, title, details):
     cf_api_key = os.environ['CONFLUENCE_TOKEN']
     gpt_api_key = os.environ['GPT_TOKEN']
     bot = ContentGenerator(gpt_api_key)
+    # Get GPT response
     draft = bot.get_completions_response(subject_matter, title, details)
+    # Post to confluence
     docs = Confluence(cf_api_key)
     docs.create_confluence_page(story.title, draft)
+    # Tag owner in confluence
+    docs.add_sc_link(story.title, story.owner)
 
 
 if __name__ == '__main__':
     _ = load_dotenv(find_dotenv())  # read local .env file
     sc_api_key = os.environ['SHORTCUT_TOKEN']
     story = Shortcut(sc_api_key)
+    # Get story details
     story.get_story(22)
     print(f'Does it need docs: {story.is_doc_needed()}')
     if story.is_doc_needed():
