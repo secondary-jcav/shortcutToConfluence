@@ -3,9 +3,11 @@ import requests
 
 class Shortcut:
     def __init__(self, key):
+        self.headers = self.build_headers(key)
         self.key = key
-        self.api_url_base = 'https://api.app.shortcut.com/api/beta'
+        self.api_url_base = 'https://api.app.shortcut.com/api/v3'
         self.search_endpoint = '/search/stories'
+        self.owner = ''
         self.doc_tag = 'doc_needed'
         self.title = ''
         self.body = ''
@@ -18,8 +20,8 @@ class Shortcut:
         """
         search_query = {'query': story_id, 'page_size': 1}
         try:
-            url = self.api_url_base + self.search_endpoint + '?token=' + self.key
-            response = requests.get(url, params=search_query)
+            url = self.api_url_base + self.search_endpoint
+            response = requests.get(url, params=search_query, headers=self.headers)
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
             print(e)
@@ -28,7 +30,22 @@ class Shortcut:
         self.body = story['description']
         self.comments = story['comments']
         self.labels = story['labels']
+        self.owner = self.get_member(story['owner_ids'][0])
         print(self.title)
+
+    def get_member(self, member_id):
+        headers = {
+            "Content-Type": "application/json",
+            "Shortcut-Token": self.key
+        }
+        try:
+            url = self.api_url_base + '/members/' + member_id
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            print(e)
+        member = response.json()
+        return member['profile']['name']
 
     def is_doc_needed(self):
         """
@@ -43,7 +60,13 @@ class Shortcut:
         """
         return [string for string in self.labels if string != self.doc_tag]
 
-
+    @staticmethod
+    def build_headers(token):
+        headers = {
+            "Content-Type": "application/json",
+            "Shortcut-Token": token
+        }
+        return headers
 
 
 

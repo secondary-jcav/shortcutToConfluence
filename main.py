@@ -3,15 +3,19 @@ import os
 
 from Confluence import Confluence as cf
 from Shortcut import Shortcut as sc
-from DocWriter import DocWriter as dw
+from ContentGenerator import ContentGenerator as cg
 
 
 def write_draft(subject_matter, title, details):
+    """
+    Uses DocWriter class to ask the GPT endpoint.
+    Uses Confluence class to post to confluence.
+    """
     cf_api_key = os.environ['CONFLUENCE_TOKEN']
     gpt_api_key = os.environ['GPT_TOKEN']
-    writer = dw(gpt_api_key)
+    bot = cg(gpt_api_key)
+    draft = bot.get_completions_response(subject_matter, title, details)
     docs = cf(cf_api_key)
-    draft = writer.get_completions_response(subject_matter, title, details)
     docs.create_confluence_page(story.title, draft)
 
 

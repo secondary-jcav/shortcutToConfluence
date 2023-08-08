@@ -1,7 +1,7 @@
 import openai
 
 
-class DocWriter:
+class ContentGenerator:
     def __init__(self, key):
         openai.api_key = key
 
